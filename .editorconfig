@@ -1,0 +1,14 @@
+[*.cs]
+# Set maximum line length
+max_line_length = 60
+
+# Enforce line breaks for method calls
+csharp_new_line_before_open_brace = all
+
+# Style for method parameters and arguments
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_method_invocation_parameter_list_parentheses = false
+
+# Allow breaking method calls at parameters
+csharp_method_call_style = multiline
+
