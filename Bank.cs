@@ -2,8 +2,8 @@ using System.Threading.Tasks;
 
 class Bank
 {
-    public static readonly double savingsInterest = 3.5;
-    public static readonly double loanInterest = 5.2;
+    public static readonly double savingsInterest = 0.035;
+    public static readonly double loanInterest = 0.052;
     public static readonly double creditAccountCeiling = -200000.0;
 
     UserService userService;

@@ -74,7 +74,7 @@ class User
     public void CreateSavingsAccount()
     {
         if (SavingsAccount != null) throw new ArgumentException("Savings account already exists");
-        SavingsAccount = new(this, Bank.savingsInterest);
+        SavingsAccount = new(this);
         using (var db = new ApplicationDbContext())
         {
             db.Users.Attach(this);

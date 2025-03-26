@@ -67,15 +67,16 @@ class SavingsAccount : Account
 {
 
     public double Interest { get; set; }
+    public double ComputedBonus { get; set; }
 
 
     public SavingsAccount() { }
-    public SavingsAccount(User owner, double interest) : base()
+    public SavingsAccount(User owner) : base()
     {
         this.Money = 0.0;
         this.Owner = owner;
         this.CreatedAt = DateTime.Now;
-        this.Interest = interest;
+        this.Interest = Bank.savingsInterest;
     }
 
     public override void Deposit(double amount)
@@ -96,9 +97,25 @@ class SavingsAccount : Account
             db.SaveChanges();
         }
     }
-    void HandleInterest()
+    public void HandleDailyInterest()
     {
+        ComputedBonus += Money * Interest;
+        using (var db = new ApplicationDbContext())
+        {
+            db.Entry(this).State = EntityState.Modified;
+            db.SaveChanges();
+        }
+    }
 
+    public void ApplyInterest()
+    {
+        Money += ComputedBonus/12;
+        ComputedBonus = 0.0;
+        using (var db = new ApplicationDbContext())
+        {
+            db.Entry(this).State = EntityState.Modified;
+            db.SaveChanges();
+        }
     }
 }
 

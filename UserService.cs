@@ -17,8 +17,6 @@ class UserService
         {
             Console.WriteLine("User already exists.");
         }
-
-
     }
 
     public async Task DeleteUser(User user)
@@ -76,9 +74,4 @@ class UserService
             throw new ArgumentException("User not found");
         }
     }
-
-    /*public List<Account> GetAllAccounts()
-    {
-
-    }*/
 }
