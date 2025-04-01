@@ -2,12 +2,12 @@ using Microsoft.EntityFrameworkCore;
 
 class UserService
 {
-    public async Task CreateUser(string username, string name, string surname, int age, int phone, Access access, string password)
+    public static async Task CreateUser(string username, string name, string surname, int age, int phone, Access access, string password)
     {
         await using var db = new ApplicationDbContext();
         if (!await db.Users?.AnyAsync(u => u.Username == username))
         {
-            User user = new(username, name, surname, age,  phone, access, password);
+            User user = new(username, name, surname, age, phone, access, password);
             user.onUserUpdate += UpdateUser;
             db.Users?.Add(user);
             await db.SaveChangesAsync();
@@ -19,18 +19,18 @@ class UserService
         }
     }
 
-    public async Task DeleteUser(User user)
+    public static async Task DeleteUser(User user)
     {
         await using var db = new ApplicationDbContext();
         db.Users?.Remove(user);
         await db.SaveChangesAsync();
     }
 
-    public async Task UpdateUser(User user)
+    public static async Task UpdateUser(User user)
     {
         using (var db = new ApplicationDbContext())
         {
-            var existingUser = await db.Users.FindAsync(user.UserId);
+            var existingUser = await db.Users.FindAsync(user.Id);
             if (existingUser != null)
             {
                 db.Entry(existingUser).CurrentValues.SetValues(user);
@@ -43,30 +43,23 @@ class UserService
         }
     }
 
-    public async Task<List<User>> GetUsers()
+    public static async Task<List<User>> GetUsers()
     {
         await using var db = new ApplicationDbContext();
         return await (db.Users?.ToListAsync() ?? Task.FromResult(new List<User>()));
     }
 
-    public async Task<User> GetUserByUsername(string username)
+    public static async Task<User> GetUserByUsername(string username)
     {
         await using var db = new ApplicationDbContext();
         try
         {
             User? user = await db.Users?.FirstAsync(u => u.Username == username);
 
-            async Task InitiateAccounts()
-            {
-                using (var db = new ApplicationDbContext())
-                {
-                    user.CommonAccount = await db.CommonAccounts.FirstOrDefaultAsync(ca => ca.UserId == user.UserId);
-                    user.SavingsAccount = await db.SavingsAccounts.FirstOrDefaultAsync(sa => sa.UserId == user.UserId);
-                    user.CreditAccount = await db.CreditAccounts.FirstOrDefaultAsync(ca => ca.UserId == user.UserId);
-                }
-            }
+            user.CommonAccount = await db.CommonAccounts.FirstOrDefaultAsync(ca => ca.UserId == user.Id);
+            user.SavingsAccount = await db.SavingsAccounts.FirstOrDefaultAsync(sa => sa.UserId == user.Id);
+            user.CreditAccount = await db.CreditAccounts.FirstOrDefaultAsync(ca => ca.UserId == user.Id);
 
-            InitiateAccounts().Wait();
             return user;
         }
         catch (Exception)

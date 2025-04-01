@@ -2,7 +2,6 @@ using t = System.Timers;
 class TimeManagementService
 {
     t.Timer timer;
-    AccountService accountService;
     DateTime LastProgramDate { get; set; }
     public DateTime ProgramDate { get; private set; }
 
@@ -15,8 +14,6 @@ class TimeManagementService
 
         LastProgramDate = DateTime.Now;
         ProgramDate = DateTime.Now;
-
-        accountService = new();
     }
 
     public void CountTime(object? sender, t.ElapsedEventArgs e)
@@ -24,32 +21,45 @@ class TimeManagementService
         LastProgramDate = ProgramDate;
         ProgramDate += new TimeSpan(0, 0, 5);
 
-        List<SavingsAccount> allSavingsAccounts = accountService.GetSavingsAccounts();
+
 
         if (ProgramDate.Hour == 0 && ProgramDate.Minute == 0 && ProgramDate.Second == 0)
+        {
+            List<SavingsAccount> allSavingsAccounts = AccountService.GetSavingsAccounts();
             foreach (SavingsAccount sa in allSavingsAccounts) sa.HandleDailyInterest();
-        
+        }
+
+
 
         if (ProgramDate.Day == 1 && ProgramDate.Hour == 0 && ProgramDate.Minute == 0 && ProgramDate.Second == 0)
+        {
+            List<SavingsAccount> allSavingsAccounts = AccountService.GetSavingsAccounts();
             foreach (SavingsAccount sa in allSavingsAccounts) sa.ApplyInterest();
+        }
+
 
     }
 
-    public void JumpTime(int days, int hours, int minutes)
+    public void JumpTime(int months, int days, int hours)
     {
         LastProgramDate = ProgramDate;
-        ProgramDate = ProgramDate.AddDays(days).AddHours(hours).AddMinutes(minutes);
-        int timeDifferenceInDays = (int)(ProgramDate - LastProgramDate).TotalDays;
-        List<SavingsAccount> allSavingsAccounts = accountService.GetSavingsAccounts();
+        DateTime FutureDate = ProgramDate.AddMonths(months).AddDays(days).AddHours(hours);
+        int timeDifferenceInDays = (int)(FutureDate - LastProgramDate).TotalDays;
 
         if (timeDifferenceInDays == 0) return;
 
-        for (int i = 0; i < timeDifferenceInDays; i++)
-            foreach (SavingsAccount sa in allSavingsAccounts) sa.HandleDailyInterest();
-        
+        List<SavingsAccount> allSavingsAccounts = AccountService.GetSavingsAccounts();
 
-        if (ProgramDate.Month != LastProgramDate.Month)
-            foreach (SavingsAccount sa in allSavingsAccounts) sa.ApplyInterest();
-        
+        for (int i = 0; i < timeDifferenceInDays; i++)
+        {
+            ProgramDate = ProgramDate.AddDays(1);
+
+            foreach (SavingsAccount sa in allSavingsAccounts) sa.HandleDailyInterest();
+
+            if (ProgramDate.Day == DateTime.DaysInMonth(ProgramDate.Year, ProgramDate.Month))
+                foreach (SavingsAccount sa in allSavingsAccounts) sa.ApplyInterest();
+        }
+
+        ProgramDate = FutureDate;
     }
 }

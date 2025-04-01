@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace projektBanka.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250401153818_UserIdInAccountNullable")]
+    partial class UserIdInAccountNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
@@ -33,7 +36,7 @@ namespace projektBanka.Migrations
                     b.Property<double>("Money")
                         .HasColumnType("REAL");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -74,7 +77,7 @@ namespace projektBanka.Migrations
 
             modelBuilder.Entity("User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
@@ -103,7 +106,7 @@ namespace projektBanka.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
                     b.ToTable("Users");
                 });
@@ -182,9 +185,7 @@ namespace projektBanka.Migrations
                 {
                     b.HasOne("User", "Owner")
                         .WithOne("CommonAccount")
-                        .HasForeignKey("CommonAccount", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CommonAccount", "UserId");
 
                     b.Navigation("Owner");
                 });
@@ -193,9 +194,7 @@ namespace projektBanka.Migrations
                 {
                     b.HasOne("User", "Owner")
                         .WithOne("CreditAccount")
-                        .HasForeignKey("CreditAccount", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CreditAccount", "UserId");
 
                     b.Navigation("Owner");
                 });
@@ -204,9 +203,7 @@ namespace projektBanka.Migrations
                 {
                     b.HasOne("User", "Owner")
                         .WithOne("SavingsAccount")
-                        .HasForeignKey("SavingsAccount", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SavingsAccount", "UserId");
 
                     b.Navigation("Owner");
                 });

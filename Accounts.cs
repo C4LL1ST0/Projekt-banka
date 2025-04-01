@@ -11,7 +11,6 @@ abstract class Account : IComparable<Account>
     public DateTime CreatedAt { get; set; }
     public double Money { get; set; }
 
-    List<double>? MoneyHistory { get; set; }
 
     [ForeignKey("User")]
     public Guid UserId { get; set; }
@@ -31,6 +30,9 @@ abstract class Account : IComparable<Account>
     {
         return this.Money - amount >= 0 ? true : false;
     }
+
+    public abstract override string ToString();
+    
 }
 
 class CommonAccount : Account
@@ -60,6 +62,11 @@ class CommonAccount : Account
             db.Entry(this).State = EntityState.Modified;
             db.SaveChanges();
         }
+    }
+
+    public override string ToString()
+    {
+        return $"Common account: {this.Id}, money: {Money}, created at {CreatedAt}";
     }
 }
 
@@ -117,6 +124,11 @@ class SavingsAccount : Account
             db.SaveChanges();
         }
     }
+
+    public override string ToString()
+    {
+        return $"Savings account: {this.Id}, money: {Money}, created at {CreatedAt}, interest: {Interest}";
+    }
 }
 
 class CreditAccount : Account
@@ -156,5 +168,10 @@ class CreditAccount : Account
     public new bool CanPay(double amount)
     {
         return this.Money - amount > Ceiling ? true : false;
+    }
+
+    public override string ToString()
+    {
+        return $"Savings account: {this.Id}, money: {Money}, created at {CreatedAt}, interest: {Interest}, ceiling: {Ceiling}";
     }
 }

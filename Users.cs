@@ -16,7 +16,7 @@ class User
 
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid UserId { get; set; }
+    public Guid Id { get; set; }
 
     public string Username { get; set; }
     public string Name { get; set; }
@@ -52,9 +52,9 @@ class User
         {
             db.Users.Attach(this);
 
-            CommonAccount = await db.CommonAccounts.FirstOrDefaultAsync(ca => ca.UserId == this.UserId);
-            SavingsAccount = await db.SavingsAccounts.FirstOrDefaultAsync(sa => sa.UserId == this.UserId);
-            CreditAccount = await db.CreditAccounts.FirstOrDefaultAsync(ca => ca.UserId == this.UserId);
+            CommonAccount = await db.CommonAccounts.FirstOrDefaultAsync(ca => ca.UserId == this.Id);
+            SavingsAccount = await db.SavingsAccounts.FirstOrDefaultAsync(sa => sa.UserId == this.Id);
+            CreditAccount = await db.CreditAccounts.FirstOrDefaultAsync(ca => ca.UserId == this.Id);
         }
     }
 
@@ -106,7 +106,9 @@ class User
     public void WithdrawMoney(Account account, double money)
     {
         if (account == null) throw new ArgumentException("Invalid account.");
-        account.Withdraw(money);
+        if(account.CanPay(money))
+            account.Withdraw(money);
+        else throw new ArgumentException("Insufficient funds.");
     }
 
     public void MakeTransaction(Transaction transaction)

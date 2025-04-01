@@ -119,3 +119,4 @@
 /home/stepan/prg/cs/projektBanka/obj/Debug/net8.0/projektBanka.pdb
 /home/stepan/prg/cs/projektBanka/obj/Debug/net8.0/projektBanka.genruntimeconfig.cache
 /home/stepan/prg/cs/projektBanka/obj/Debug/net8.0/ref/projektBanka.dll
+/home/stepan/prg/cs/projektBanka/obj/Debug/net8.0/projektBanka.sourcelink.json
