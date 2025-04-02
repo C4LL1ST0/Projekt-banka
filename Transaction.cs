@@ -29,9 +29,9 @@ class Transaction
     {
         this.Time = DateTime.Now;
         this.PayerAccount = payerAccount;
-        this.PayerAccountId = payerAccount.Id;
+        this.PayerAccountId = payerAccount.AccountEntity.Id;
         this.DestinationAccount = destinationAccount;
-        this.DestinationAccountId = destinationAccount.Id;
+        this.DestinationAccountId = destinationAccount.AccountEntity.Id;
         this.Amount = amount;
     }
 }

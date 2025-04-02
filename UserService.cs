@@ -55,16 +55,26 @@ class UserService
         try
         {
             User? user = await db.Users?.FirstAsync(u => u.Username == username);
-
-            user.CommonAccount = await db.CommonAccounts.FirstOrDefaultAsync(ca => ca.UserId == user.Id);
-            user.SavingsAccount = await db.SavingsAccounts.FirstOrDefaultAsync(sa => sa.UserId == user.Id);
-            user.CreditAccount = await db.CreditAccounts.FirstOrDefaultAsync(ca => ca.UserId == user.Id);
-
+            AssignAccountsToUser(user);
             return user;
         }
         catch (Exception)
         {
             throw new ArgumentException("User not found");
         }
+    }
+
+    public static async void AssignAccountsToUser(User user)
+    {
+        await using var db = new ApplicationDbContext();
+
+        var commonAccountEntity = await db.CommonAccounts.FirstOrDefaultAsync(cae => cae.UserId == user.Id);
+        user.CommonAccount = new CommonAccount(commonAccountEntity);
+
+        var savingsAccountEntity = await db.SavingsAccounts.FirstOrDefaultAsync(sae => sae.UserId == user.Id);
+        user.SavingsAccount = new SavingsAccount(savingsAccountEntity);
+
+        var creditAccountEntity = await db.CreditAccounts.FirstOrDefaultAsync(cae => cae.UserId == user.Id);
+        user.CreditAccount = new CreditAccount(creditAccountEntity, creditAccountEntity.Interest);
     }
 }

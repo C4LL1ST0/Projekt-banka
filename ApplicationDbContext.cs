@@ -4,9 +4,9 @@ class ApplicationDbContext : DbContext
 {
     public DbSet<User>? Users { get; set; }
 
-    public DbSet<CommonAccount>? CommonAccounts { get; set; }
-    public DbSet<SavingsAccount>? SavingsAccounts { get; set; }
-    public DbSet<CreditAccount>? CreditAccounts { get; set; }
+    public DbSet<CommonAccountEntity> CommonAccounts { get; set; }
+    public DbSet<SavingsAccountEntity> SavingsAccounts { get; set; }
+    public DbSet<CreditAccountEntity> CreditAccounts { get; set; }
     public DbSet<Transaction>? Transactions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
@@ -14,20 +14,31 @@ class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>()
-            .HasOne(u => u.CommonAccount)
-            .WithOne(ca => ca.Owner)
-            .HasForeignKey<CommonAccount>(ca => ca.UserId);
+        // Ignore the Account class and its derived classes
+        modelBuilder.Ignore<Account>();
+        modelBuilder.Ignore<CommonAccount>();
+        modelBuilder.Ignore<SavingsAccount>();
+        modelBuilder.Ignore<CreditAccount>();
+
+        // Configure the AccountEntity classes
+        modelBuilder.Entity<CommonAccountEntity>().ToTable("CommonAccounts");
+        modelBuilder.Entity<SavingsAccountEntity>().ToTable("SavingsAccounts");
+        modelBuilder.Entity<CreditAccountEntity>().ToTable("CreditAccounts");
+
+        /* modelBuilder.Entity<User>()
+            .HasOne(u => u.CommonAccountEntity)
+            .WithOne(cae => cae.Owner)
+            .HasForeignKey<CommonAccountEntity>(cae => cae.UserId);
 
         modelBuilder.Entity<User>()
-            .HasOne(u => u.SavingsAccount)
-            .WithOne(sa => sa.Owner)
-            .HasForeignKey<SavingsAccount>(sa => sa.UserId);
+            .HasOne(u => u.SavingsAccountEntity)
+            .WithOne(sae => sae.Owner)
+            .HasForeignKey<SavingsAccountEntity>(sae => sae.UserId);
 
         modelBuilder.Entity<User>()
-            .HasOne(u => u.CreditAccount)
-            .WithOne(cra => cra.Owner)
-            .HasForeignKey<CreditAccount>(ca => ca.UserId);
+            .HasOne(u => u.CreditAccountEntity)
+            .WithOne(crae => crae.Owner)
+            .HasForeignKey<CreditAccountEntity>(cae => cae.UserId); */
 
         modelBuilder.Entity<Transaction>()
             .HasOne(t => t.PayerAccount)

@@ -27,8 +27,15 @@ class User
     public string Password { get; set; }
 
 
+    public CommonAccountEntity? CommonAccountEntity { get; set; }
+    public SavingsAccountEntity? SavingsAccountEntity { get; set; }
+    public CreditAccountEntity? CreditAccountEntity { get; set; }
+
+    [NotMapped]
     public CommonAccount? CommonAccount { get; set; }
+    [NotMapped]
     public SavingsAccount? SavingsAccount { get; set; }
+    [NotMapped]
     public CreditAccount? CreditAccount { get; set; }
 
     public User() { }
@@ -51,21 +58,18 @@ class User
         using (var db = new ApplicationDbContext())
         {
             db.Users.Attach(this);
-
-            CommonAccount = await db.CommonAccounts.FirstOrDefaultAsync(ca => ca.UserId == this.Id);
-            SavingsAccount = await db.SavingsAccounts.FirstOrDefaultAsync(sa => sa.UserId == this.Id);
-            CreditAccount = await db.CreditAccounts.FirstOrDefaultAsync(ca => ca.UserId == this.Id);
+            UserService.AssignAccountsToUser(this);
         }
     }
 
     public void CreateCommonAccount()
     {
         if (CommonAccount != null) throw new ArgumentException("Common account already exists");
-        CommonAccount = new(this);
+        CommonAccount = AccountService.CreateCommonAccount(this);
         using (var db = new ApplicationDbContext())
         {
             db.Users.Attach(this);
-            db.CommonAccounts.Add(CommonAccount);
+            db.CommonAccounts.Add((CommonAccountEntity)CommonAccount.AccountEntity);
             db.SaveChanges();
         }
         onUserUpdate?.Invoke(this);
@@ -74,11 +78,11 @@ class User
     public void CreateSavingsAccount()
     {
         if (SavingsAccount != null) throw new ArgumentException("Savings account already exists");
-        SavingsAccount = new(this);
+        SavingsAccount = AccountService.CreateSavingsAccount(this);
         using (var db = new ApplicationDbContext())
         {
             db.Users.Attach(this);
-            db.SavingsAccounts.Add(SavingsAccount);
+            db.SavingsAccounts.Add((SavingsAccountEntity)SavingsAccount.AccountEntity);
             db.SaveChanges();
         }
         onUserUpdate?.Invoke(this);
@@ -87,11 +91,11 @@ class User
     public void CreateCreditAccount()
     {
         if (CreditAccount != null) throw new ArgumentException("Credit account already exists");
-        CreditAccount = new(this, Bank.loanInterest);
+        CreditAccount = AccountService.CreateCreditAccount(this);
         using (var db = new ApplicationDbContext())
         {
             db.Users.Attach(this);
-            db.CreditAccounts.Add(CreditAccount);
+            db.CreditAccounts.Add((CreditAccountEntity)CreditAccount.AccountEntity);
             db.SaveChanges();
         }
         onUserUpdate?.Invoke(this);

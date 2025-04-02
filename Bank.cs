@@ -293,11 +293,11 @@ class Bank
             Console.WriteLine("Enter the amount you want to transfer:");
             double amount = double.Parse(Console.ReadLine());
             Console.WriteLine("Enter your account ID:");
-            Account payerAccount = await AccountService.GetAccount(Console.ReadLine());
-            if (payerAccount == null || payerAccount.UserId == null) UserMenu(user);
+            Account payerAccount = await AccountService.GetAccountById(Console.ReadLine());
+            if (payerAccount == null || payerAccount.AccountEntity.Owner == null) UserMenu(user);
             Console.WriteLine("Enter the destination account ID:");
-            Account destinationAccount = await AccountService.GetAccount(Console.ReadLine());
-            if (destinationAccount == null || destinationAccount.UserId == null) UserMenu(user);
+            Account destinationAccount = await AccountService.GetAccountById(Console.ReadLine());
+            if (destinationAccount == null || destinationAccount.AccountEntity.Owner == null) UserMenu(user);
             user.MakeTransaction(new(payerAccount, destinationAccount, amount));
         }
 
