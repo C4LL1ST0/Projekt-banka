@@ -25,6 +25,7 @@ class User
     public int Phone { get; set; }
     public Access Access { get; set; }
     public string Password { get; set; }
+    public bool IsStudent {get; set;}
 
 
     public CommonAccount? CommonAccount { get; set; }
@@ -33,7 +34,7 @@ class User
 
     public User() { }
 
-    public User(string username, string name, string surname, int age, int phone, Access access, string password)
+    public User(string username, string name, string surname, int age, int phone, Access access, string password, bool isStudent)
     {
         this.Username = username;
         this.Name = name;
@@ -42,6 +43,7 @@ class User
         this.Phone = phone;
         this.Access = access;
         this.Password = password;
+        this.IsStudent = isStudent;
 
         InitiateAccounts().Wait();
     }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace projektBanka.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250403194940_AddLogging")]
+    partial class AddLogging
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
@@ -92,9 +95,6 @@ namespace projektBanka.Migrations
                     b.Property<int>("Age")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsStudent")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -139,11 +139,11 @@ namespace projektBanka.Migrations
                     b.Property<double>("Ceiling")
                         .HasColumnType("REAL");
 
-                    b.Property<double>("ComputedMinus")
-                        .HasColumnType("REAL");
-
                     b.Property<double>("Interest")
                         .HasColumnType("REAL");
+
+                    b.Property<TimeSpan?>("InterestFreePeriod")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
@@ -163,9 +163,6 @@ namespace projektBanka.Migrations
 
                     b.Property<double>("Interest")
                         .HasColumnType("REAL");
-
-                    b.Property<bool>("IsStudent")
-                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");

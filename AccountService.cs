@@ -11,6 +11,14 @@ class AccountService{
         }
     }
 
+    public static List<CreditAccount> GetCreditAccounts()
+    {
+        using (var db = new ApplicationDbContext())
+        {
+            return db.CreditAccounts.ToList();
+        }
+    }
+
     public static async Task<List<Account>> GetAllAccounts()
     {
         var accounts = new List<Account>();

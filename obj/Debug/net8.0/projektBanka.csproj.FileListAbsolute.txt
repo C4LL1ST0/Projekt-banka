@@ -120,3 +120,4 @@
 /home/stepan/prg/cs/projektBanka/obj/Debug/net8.0/projektBanka.genruntimeconfig.cache
 /home/stepan/prg/cs/projektBanka/obj/Debug/net8.0/ref/projektBanka.dll
 /home/stepan/prg/cs/projektBanka/obj/Debug/net8.0/projektBanka.sourcelink.json
+/home/stepan/prg/cs/projektBanka/bin/Debug/net8.0/Newtonsoft.Json.dll

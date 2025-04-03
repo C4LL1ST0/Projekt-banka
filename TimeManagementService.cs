@@ -27,6 +27,11 @@ class TimeManagementService
         {
             List<SavingsAccount> allSavingsAccounts = AccountService.GetSavingsAccounts();
             foreach (SavingsAccount sa in allSavingsAccounts) sa.HandleDailyInterest();
+
+            if (ProgramDate > Bank.startOfInterestFreePeriod && ProgramDate < Bank.endOfInterestFreePeriod) return;
+
+            List<CreditAccount> allCreditAccount = AccountService.GetCreditAccounts();
+            foreach (var ca in allCreditAccount) ca.HandleDailyInterest();
         }
 
 
@@ -35,6 +40,12 @@ class TimeManagementService
         {
             List<SavingsAccount> allSavingsAccounts = AccountService.GetSavingsAccounts();
             foreach (SavingsAccount sa in allSavingsAccounts) sa.ApplyInterest();
+        }
+
+        if (ProgramDate.Day == DateTime.DaysInMonth(ProgramDate.Year, ProgramDate.Month) && ProgramDate.Hour == 0 && ProgramDate.Minute == 0 && ProgramDate.Second == 0)
+        {
+            List<CreditAccount> allCreditAccount = AccountService.GetCreditAccounts();
+            foreach (var ca in allCreditAccount) ca.ApplyInterest();
         }
 
 
@@ -46,15 +57,28 @@ class TimeManagementService
         DateTime FutureDate = ProgramDate.AddMonths(months).AddDays(days).AddHours(hours);
         int timeDifferenceInDays = (int)(FutureDate - LastProgramDate).TotalDays;
 
-        if (timeDifferenceInDays == 0) return;
+        if (timeDifferenceInDays == 0)
+        {
+            ProgramDate = FutureDate;
+            return;
+        }
 
         List<SavingsAccount> allSavingsAccounts = AccountService.GetSavingsAccounts();
+        List<CreditAccount> allCreditAccount = AccountService.GetCreditAccounts();
 
         for (int i = 0; i < timeDifferenceInDays; i++)
         {
             ProgramDate = ProgramDate.AddDays(1);
 
             foreach (SavingsAccount sa in allSavingsAccounts) sa.HandleDailyInterest();
+
+            if (ProgramDate.Day == 1)
+                foreach (SavingsAccount sa in allSavingsAccounts) sa.ApplyInterest();
+
+
+
+            if (ProgramDate > Bank.startOfInterestFreePeriod && ProgramDate < Bank.endOfInterestFreePeriod);
+            else foreach (var ca in allCreditAccount) ca.HandleDailyInterest();
 
             if (ProgramDate.Day == DateTime.DaysInMonth(ProgramDate.Year, ProgramDate.Month))
                 foreach (SavingsAccount sa in allSavingsAccounts) sa.ApplyInterest();

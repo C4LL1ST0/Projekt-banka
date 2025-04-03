@@ -2,12 +2,12 @@ using Microsoft.EntityFrameworkCore;
 
 class UserService
 {
-    public static async Task CreateUser(string username, string name, string surname, int age, int phone, Access access, string password)
+    public static async Task CreateUser(string username, string name, string surname, int age, int phone, Access access, string password, bool isStudent)
     {
         await using var db = new ApplicationDbContext();
         if (!await db.Users?.AnyAsync(u => u.Username == username))
         {
-            User user = new(username, name, surname, age, phone, access, password);
+            User user = new(username, name, surname, age, phone, access, password, isStudent);
             user.onUserUpdate += UpdateUser;
             db.Users?.Add(user);
             await db.SaveChangesAsync();

@@ -8,18 +8,19 @@ class ApplicationDbContext : DbContext
     public DbSet<SavingsAccount>? SavingsAccounts { get; set; }
     public DbSet<CreditAccount>? CreditAccounts { get; set; }
     public DbSet<Transaction>? Transactions { get; set; }
+    public DbSet<LogMsg>? Logs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite("Data Source=bank.db");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure TPC for Account hierarchy
         modelBuilder.Entity<CommonAccount>().ToTable("CommonAccounts");
         modelBuilder.Entity<SavingsAccount>().ToTable("SavingsAccounts");
         modelBuilder.Entity<CreditAccount>().ToTable("CreditAccounts");
 
-        // Configure relationships for each account type
+        modelBuilder.Entity<LogMsg>().ToTable("Logs");
+
         modelBuilder.Entity<CommonAccount>()
             .HasOne(ca => ca.Owner)
             .WithOne(u => u.CommonAccount)
@@ -35,7 +36,6 @@ class ApplicationDbContext : DbContext
             .WithOne(u => u.CreditAccount)
             .HasForeignKey<CreditAccount>(cra => cra.UserId);
 
-        // Configure other entities (e.g., Transactions)
         modelBuilder.Entity<Transaction>()
             .HasOne(t => t.PayerAccount)
             .WithMany()

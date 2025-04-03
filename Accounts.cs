@@ -83,6 +83,8 @@ class SavingsAccount : Account, IAccount
     public double Interest { get; set; }
     public double ComputedBonus { get; set; }
 
+    public bool IsStudent{get; set;}
+
 
     public SavingsAccount() { }
     public SavingsAccount(User owner) : base()
@@ -91,6 +93,7 @@ class SavingsAccount : Account, IAccount
         this.Owner = owner;
         this.CreatedAt = DateTime.Now;
         this.Interest = Bank.savingsInterest;
+        this.IsStudent = owner.IsStudent;
     }
 
     public void HandleDailyInterest()
@@ -126,10 +129,11 @@ class CreditAccount : Account, IAccount
     public Guid UserId { get; set; }
     public User Owner { get; set; }
 
+    public double ComputedMinus{get; set;}
+
     public double Ceiling { get; set; }
     public double Interest { get; set; }
-    public TimeSpan? InterestFreePeriod { get; set; }
-
+    
     public CreditAccount() { }
     public CreditAccount(User owner, double insterest) : base()
     {
@@ -148,5 +152,26 @@ class CreditAccount : Account, IAccount
     public override string ToString()
     {
         return $"Savings account: {this.Id}, money: {Money}, created at {CreatedAt}, interest: {Interest}, ceiling: {Ceiling}";
+    }
+
+    public void HandleDailyInterest()
+    {
+        ComputedMinus -= Math.Abs(Money * Interest);
+        using (var db = new ApplicationDbContext())
+        {
+            db.Entry(this).State = EntityState.Modified;
+            db.SaveChanges();
+        }
+    }
+
+    public void ApplyInterest()
+    {
+        Money += ComputedMinus / 12;
+        ComputedMinus = 0.0;
+        using (var db = new ApplicationDbContext())
+        {
+            db.Entry(this).State = EntityState.Modified;
+            db.SaveChanges();
+        }
     }
 }
