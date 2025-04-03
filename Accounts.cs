@@ -2,23 +2,46 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
+interface IAccount
+{
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public User Owner { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public double Money { get; set; }
+
+    public abstract void Deposit(double amount);
+    public abstract void Withdraw(double amount);
+    public string ToString();
+    public bool CanPay(double amount);
+}
 abstract class Account : IComparable<Account>
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public Guid Id { get; set; }
-
+    
     public DateTime CreatedAt { get; set; }
     public double Money { get; set; }
 
-
-    [ForeignKey("User")]
-    public Guid UserId { get; set; }
-
-    public User Owner { get; set; }
-
-    public abstract void Deposit(double amount);
-    public abstract void Withdraw(double amount);
+    public void Deposit(double amount)
+    {
+        Money += amount;
+        using (var db = new ApplicationDbContext())
+        {
+            db.Entry(this).State = EntityState.Modified;
+            db.SaveChanges();
+        }
+    }
+    public void Withdraw(double amount)
+    {
+        Money -= amount;
+        using (var db = new ApplicationDbContext())
+        {
+            db.Entry(this).State = EntityState.Modified;
+            db.SaveChanges();
+        }
+    }
     public int CompareTo(Account? other)
     {
         if (other == null) throw new ArgumentException("Invalid account.");
@@ -30,13 +53,13 @@ abstract class Account : IComparable<Account>
     {
         return this.Money - amount >= 0 ? true : false;
     }
-
-    public abstract override string ToString();
-    
 }
 
-class CommonAccount : Account
+class CommonAccount : Account, IAccount
 {
+    [ForeignKey("User")]
+    public Guid UserId { get; set; }
+    public User Owner { get; set; }
     public CommonAccount() { }
     public CommonAccount(User owner) : base()
     {
@@ -45,33 +68,17 @@ class CommonAccount : Account
         this.CreatedAt = DateTime.Now;
     }
 
-    public override void Deposit(double amount)
-    {
-        Money += amount;
-        using (var db = new ApplicationDbContext())
-        {
-            db.Entry(this).State = EntityState.Modified;
-            db.SaveChanges();
-        }
-    }
-    public override void Withdraw(double amount)
-    {
-        Money -= amount;
-        using (var db = new ApplicationDbContext())
-        {
-            db.Entry(this).State = EntityState.Modified;
-            db.SaveChanges();
-        }
-    }
-
     public override string ToString()
     {
         return $"Common account: {this.Id}, money: {Money}, created at {CreatedAt}";
     }
 }
 
-class SavingsAccount : Account
+class SavingsAccount : Account, IAccount
 {
+    [ForeignKey("User")]
+    public Guid UserId { get; set; }
+    public User Owner { get; set; }
 
     public double Interest { get; set; }
     public double ComputedBonus { get; set; }
@@ -86,24 +93,6 @@ class SavingsAccount : Account
         this.Interest = Bank.savingsInterest;
     }
 
-    public override void Deposit(double amount)
-    {
-        Money += amount;
-        using (var db = new ApplicationDbContext())
-        {
-            db.Entry(this).State = EntityState.Modified;
-            db.SaveChanges();
-        }
-    }
-    public override void Withdraw(double amount)
-    {
-        Money -= amount;
-        using (var db = new ApplicationDbContext())
-        {
-            db.Entry(this).State = EntityState.Modified;
-            db.SaveChanges();
-        }
-    }
     public void HandleDailyInterest()
     {
         ComputedBonus += Money * Interest;
@@ -116,7 +105,7 @@ class SavingsAccount : Account
 
     public void ApplyInterest()
     {
-        Money += ComputedBonus/12;
+        Money += ComputedBonus / 12;
         ComputedBonus = 0.0;
         using (var db = new ApplicationDbContext())
         {
@@ -131,8 +120,12 @@ class SavingsAccount : Account
     }
 }
 
-class CreditAccount : Account
+class CreditAccount : Account, IAccount
 {
+    [ForeignKey("User")]
+    public Guid UserId { get; set; }
+    public User Owner { get; set; }
+
     public double Ceiling { get; set; }
     public double Interest { get; set; }
     public TimeSpan? InterestFreePeriod { get; set; }
@@ -147,24 +140,6 @@ class CreditAccount : Account
         this.Interest = insterest;
     }
 
-    public override void Deposit(double amount)
-    {
-        Money += amount;
-        using (var db = new ApplicationDbContext())
-        {
-            db.Entry(this).State = EntityState.Modified;
-            db.SaveChanges();
-        }
-    }
-    public override void Withdraw(double amount)
-    {
-        Money -= amount;
-        using (var db = new ApplicationDbContext())
-        {
-            db.Entry(this).State = EntityState.Modified;
-            db.SaveChanges();
-        }
-    }
     public new bool CanPay(double amount)
     {
         return this.Money - amount > Ceiling ? true : false;

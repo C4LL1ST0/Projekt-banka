@@ -46,7 +46,7 @@ class AccountService{
         return accounts;
     }
 
-    public static async Task<Account> GetAccount(string accountId)
+    public static async Task<IAccount> GetAccount(string accountId)
     {
         using (var db = new ApplicationDbContext())
         {

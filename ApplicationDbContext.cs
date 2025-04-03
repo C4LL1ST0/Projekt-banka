@@ -14,21 +14,28 @@ class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<User>()
-            .HasOne(u => u.CommonAccount)
-            .WithOne(ca => ca.Owner)
+        // Configure TPC for Account hierarchy
+        modelBuilder.Entity<CommonAccount>().ToTable("CommonAccounts");
+        modelBuilder.Entity<SavingsAccount>().ToTable("SavingsAccounts");
+        modelBuilder.Entity<CreditAccount>().ToTable("CreditAccounts");
+
+        // Configure relationships for each account type
+        modelBuilder.Entity<CommonAccount>()
+            .HasOne(ca => ca.Owner)
+            .WithOne(u => u.CommonAccount)
             .HasForeignKey<CommonAccount>(ca => ca.UserId);
 
-        modelBuilder.Entity<User>()
-            .HasOne(u => u.SavingsAccount)
-            .WithOne(sa => sa.Owner)
+        modelBuilder.Entity<SavingsAccount>()
+            .HasOne(sa => sa.Owner)
+            .WithOne(u => u.SavingsAccount)
             .HasForeignKey<SavingsAccount>(sa => sa.UserId);
 
-        modelBuilder.Entity<User>()
-            .HasOne(u => u.CreditAccount)
-            .WithOne(cra => cra.Owner)
-            .HasForeignKey<CreditAccount>(ca => ca.UserId);
+        modelBuilder.Entity<CreditAccount>()
+            .HasOne(cra => cra.Owner)
+            .WithOne(u => u.CreditAccount)
+            .HasForeignKey<CreditAccount>(cra => cra.UserId);
 
+        // Configure other entities (e.g., Transactions)
         modelBuilder.Entity<Transaction>()
             .HasOne(t => t.PayerAccount)
             .WithMany()

@@ -18,7 +18,7 @@ class Transaction
 
     public Guid DestinationAccountId { get; set; }
 
-    [ForeignKey("DestinationAccountId")]
+    [ForeignKey("DestinationAccountId")]                     
 
     public Account DestinationAccount { get; set; }
 

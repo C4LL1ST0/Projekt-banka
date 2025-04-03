@@ -25,24 +25,14 @@ namespace projektBanka.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("TEXT");
-
                     b.Property<double>("Money")
                         .HasColumnType("REAL");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.ToTable("Account");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Account");
-
-                    b.UseTphMappingStrategy();
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Transaction", b =>
@@ -112,10 +102,13 @@ namespace projektBanka.Migrations
                 {
                     b.HasBaseType("Account");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.HasDiscriminator().HasValue("CommonAccount");
+                    b.ToTable("CommonAccounts", (string)null);
                 });
 
             modelBuilder.Entity("CreditAccount", b =>
@@ -131,10 +124,13 @@ namespace projektBanka.Migrations
                     b.Property<TimeSpan?>("InterestFreePeriod")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.HasDiscriminator().HasValue("CreditAccount");
+                    b.ToTable("CreditAccounts", (string)null);
                 });
 
             modelBuilder.Entity("SavingsAccount", b =>
@@ -147,16 +143,13 @@ namespace projektBanka.Migrations
                     b.Property<double>("Interest")
                         .HasColumnType("REAL");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Account", t =>
-                        {
-                            t.Property("Interest")
-                                .HasColumnName("SavingsAccount_Interest");
-                        });
-
-                    b.HasDiscriminator().HasValue("SavingsAccount");
+                    b.ToTable("SavingsAccounts", (string)null);
                 });
 
             modelBuilder.Entity("Transaction", b =>
@@ -180,6 +173,12 @@ namespace projektBanka.Migrations
 
             modelBuilder.Entity("CommonAccount", b =>
                 {
+                    b.HasOne("Account", null)
+                        .WithOne()
+                        .HasForeignKey("CommonAccount", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("User", "Owner")
                         .WithOne("CommonAccount")
                         .HasForeignKey("CommonAccount", "UserId")
@@ -191,6 +190,12 @@ namespace projektBanka.Migrations
 
             modelBuilder.Entity("CreditAccount", b =>
                 {
+                    b.HasOne("Account", null)
+                        .WithOne()
+                        .HasForeignKey("CreditAccount", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("User", "Owner")
                         .WithOne("CreditAccount")
                         .HasForeignKey("CreditAccount", "UserId")
@@ -202,6 +207,12 @@ namespace projektBanka.Migrations
 
             modelBuilder.Entity("SavingsAccount", b =>
                 {
+                    b.HasOne("Account", null)
+                        .WithOne()
+                        .HasForeignKey("SavingsAccount", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("User", "Owner")
                         .WithOne("SavingsAccount")
                         .HasForeignKey("SavingsAccount", "UserId")
