@@ -25,7 +25,7 @@ class ApplicationDbContext : DbContext
         modelBuilder.Entity<SavingsAccountEntity>().ToTable("SavingsAccounts");
         modelBuilder.Entity<CreditAccountEntity>().ToTable("CreditAccounts");
 
-        /* modelBuilder.Entity<User>()
+        modelBuilder.Entity<User>()
             .HasOne(u => u.CommonAccountEntity)
             .WithOne(cae => cae.Owner)
             .HasForeignKey<CommonAccountEntity>(cae => cae.UserId);
@@ -38,7 +38,7 @@ class ApplicationDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasOne(u => u.CreditAccountEntity)
             .WithOne(crae => crae.Owner)
-            .HasForeignKey<CreditAccountEntity>(cae => cae.UserId); */
+            .HasForeignKey<CreditAccountEntity>(cae => cae.UserId);
 
         modelBuilder.Entity<Transaction>()
             .HasOne(t => t.PayerAccount)
